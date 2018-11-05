@@ -27,7 +27,7 @@ var landscape;
 var grass;
 var usersCar;
 var directions;
-var currentDate = new Date().getTime();
+var currentDate;
 var raceStartTime;
 
 function preload ()
@@ -129,6 +129,7 @@ function create ()
 function update ()
 {
     /* Выводим текущее время */
+    currentDate = new Date().getTime();
     var minutes = Math.floor((currentDate % (1000 * 60 * 60)) / (1000 * 60));
     var seconds = Math.floor((currentDate % (1000 * 60)) / 1000);
     if(seconds < 10){
