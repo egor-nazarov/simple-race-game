@@ -27,11 +27,11 @@ var landscape;
 var grass;
 var usersCar;
 var directions;
-// var barrier__stable;
+var currentDate = new Date().getTime();
+var raceStartTime;
 
 function preload ()
 {
-    // this.load.image("barrier__stable", "assets/Objects/rock2.png");
     this.load.image("usersCar", "assets/Cars/car_blue_1.png");
     this.load.image("grass", "assets/Tiles/Grass/land_grass04.png");
     this.load.image("route__start", "assets/Tiles/Asphalt road/road_asphalt43.png");
@@ -112,6 +112,7 @@ function create ()
     var route__path_23 = this.add.sprite(3, 253, 'route__path_straight-vertical').setOrigin(0, 0);
     var route__path_24 = this.add.sprite(3, 125, 'route__path_straight-vertical').setOrigin(0, 0);
 
+    /* Обьединение кусочков трассы */
     route__path.add([ route__path_1, route__path_2, route__path_3, route__path_4, route__path_5, route__path_6, route__path_7, route__path_8, route__path_9, route__path_10, route__path_11, route__path_12, route__path_13, route__path_14, route__path_15, route__path_16, route__path_17, route__path_18, route__path_19, route__path_20, route__path_21, route__path_22, route__path_23, route__path_24 ]);
 
     /* Машинка пользователя */
@@ -120,10 +121,25 @@ function create ()
     usersCar.setFrictionAir(0.15);
     usersCar.setMass(30);
     directions = this.input.keyboard.createCursorKeys();
+
+    /* Подсчет времени поездки */
+    raceStartTime = this.add.text(530, 400, 'Время: 0:00.000', { font: '30px Arial', fill: '#30fff8' });
 }
 
 function update ()
 {
+    /* Выводим текущее время */
+    var minutes = Math.floor((currentDate % (1000 * 60 * 60)) / (1000 * 60));
+    var seconds = Math.floor((currentDate % (1000 * 60)) / 1000);
+    if(seconds < 10){
+        seconds = '0'+seconds;
+    }
+    var tenthSeconds = new Date().getMilliseconds();
+    if(tenthSeconds < 100){
+        tenthSeconds = '0'+tenthSeconds;
+    }
+    raceStartTime.setText('Время: ' + minutes + ':' + seconds + '.' + tenthSeconds);
+
     /* Движение машинки игрока */
     if (directions.up.isDown)
     {
