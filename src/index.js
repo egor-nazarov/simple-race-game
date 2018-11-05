@@ -29,6 +29,8 @@ var usersCar;
 var directions;
 var currentDate;
 var raceStartTime;
+var beginningMessage;
+var beginningCountdown;
 
 function preload ()
 {
@@ -124,13 +126,43 @@ function create ()
 
     /* Подсчет времени поездки */
     raceStartTime = this.add.text(530, 400, 'Время: 0:00.000', { font: '30px Arial', fill: '#30fff8' });
+
+    /* Стартовый таймер обратного отсчета */
+    // text = this.add.text(300, 70, 'Время: 0:00.000', { font: '30px Arial', fill: '#30fff8' });
+    beginningMessage = this.add.text(300, 70, 'Время: 0:00.000', { font: "30px Arial", fill: "#fff" });
+    beginningMessage.setStroke('#28c2ff', 10);
+    beginningMessage.setShadow(1, 1, "#333333", 1, true, true);
+    beginningCountdown = this.time.addEvent({ delay: 1000, callback: onEvent, callbackScope: this, repeat: 4 });
+}
+
+function onEvent ()
+{
+    if ( beginningCountdown.repeatCount === 0 ){
+        var child = beginningMessage;
+
+        if (child)
+        {
+            this.children.remove(child);
+        }
+    }
+
 }
 
 function update ()
 {
+    /* Выводим таймер обратного отсчета */
+    if ( beginningCountdown.repeatCount === 0 ){
+        beginningMessage.setText('ПОЕХАЛИ!!!');
+    } else {
+        beginningMessage.setText('До начала гонки осталось: ' + beginningCountdown.repeatCount + ' секунд');
+    }
+
     /* Выводим текущее время */
     currentDate = new Date().getTime();
     var minutes = Math.floor((currentDate % (1000 * 60 * 60)) / (1000 * 60));
+    if(minutes < 10){
+        minutes = '0'+minutes;
+    }
     var seconds = Math.floor((currentDate % (1000 * 60)) / 1000);
     if(seconds < 10){
         seconds = '0'+seconds;
@@ -141,23 +173,25 @@ function update ()
     }
     raceStartTime.setText('Время: ' + minutes + ':' + seconds + '.' + tenthSeconds);
 
-    /* Движение машинки игрока */
-    if (directions.up.isDown)
-    {
-        usersCar.thrust(0.08);
-    }
-    if (directions.down.isDown)
-    {
-        usersCar.thrust(-0.04);
-    }
+    if ( beginningCountdown.repeatCount === 0 ){
+        /* Движение машинки игрока */
+        if (directions.up.isDown)
+        {
+            usersCar.thrust(0.08);
+        }
+        if (directions.down.isDown)
+        {
+            usersCar.thrust(-0.04);
+        }
 
-    /* Повороты машинки игрока */
-    if (directions.left.isDown)
-    {
-        (directions.up.isDown || directions.down.isDown ? usersCar.setAngularVelocity(-0.07) : null)
-    }
-    if (directions.right.isDown)
-    {
-        (directions.up.isDown || directions.down.isDown ? usersCar.setAngularVelocity(0.07) : null)
+        /* Повороты машинки игрока */
+        if (directions.left.isDown)
+        {
+            (directions.up.isDown || directions.down.isDown ? usersCar.setAngularVelocity(-0.07) : null)
+        }
+        if (directions.right.isDown)
+        {
+            (directions.up.isDown || directions.down.isDown ? usersCar.setAngularVelocity(0.07) : null)
+        }
     }
 }
