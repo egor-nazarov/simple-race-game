@@ -27,10 +27,12 @@ var landscape;
 var grass;
 var usersCar;
 var directions;
-var currentDate;
-var raceStartTime;
 var beginningMessage;
 var beginningCountdown;
+var raceDuration;
+var raceDurationCountdown;
+var raceDurationminutes = 0;
+var raceDurationseconds = 0;
 
 function preload ()
 {
@@ -124,15 +126,15 @@ function create ()
     usersCar.setMass(30);
     directions = this.input.keyboard.createCursorKeys();
 
-    /* Подсчет времени поездки */
-    raceStartTime = this.add.text(530, 400, 'Время: 0:00.000', { font: '30px Arial', fill: '#30fff8' });
-
     /* Стартовый таймер обратного отсчета */
-    // text = this.add.text(300, 70, 'Время: 0:00.000', { font: '30px Arial', fill: '#30fff8' });
     beginningMessage = this.add.text(300, 70, 'Время: 0:00.000', { font: "30px Arial", fill: "#fff" });
     beginningMessage.setStroke('#28c2ff', 10);
     beginningMessage.setShadow(1, 1, "#333333", 1, true, true);
     beginningCountdown = this.time.addEvent({ delay: 1000, callback: onEvent, callbackScope: this, repeat: 4 });
+
+    /* Подсчет времени поездки */
+    raceDurationCountdown = this.time.addEvent({ delay: 1000, callback: countTime, callbackScope: this, loop: true });
+    raceDuration = this.add.text(530, 420, '', { font: "30px Arial", fill: "#fff" });
 }
 
 function onEvent ()
@@ -145,7 +147,16 @@ function onEvent ()
             this.children.remove(child);
         }
     }
+}
 
+function countTime() {
+    function countBegin(){
+        raceDurationseconds ++;
+        if(raceDurationseconds < 10){
+            raceDurationseconds = '0'+raceDurationseconds;
+        }
+    }
+    setTimeout(countBegin, 4000)
 }
 
 function update ()
@@ -157,23 +168,19 @@ function update ()
         beginningMessage.setText('До начала гонки осталось: ' + beginningCountdown.repeatCount + ' секунд');
     }
 
-    /* Выводим текущее время */
-    currentDate = new Date().getTime();
-    var minutes = Math.floor((currentDate % (1000 * 60 * 60)) / (1000 * 60));
-    if(minutes < 10){
-        minutes = '0'+minutes;
-    }
-    var seconds = Math.floor((currentDate % (1000 * 60)) / 1000);
-    if(seconds < 10){
-        seconds = '0'+seconds;
-    }
-    var tenthSeconds = new Date().getMilliseconds();
-    if(tenthSeconds < 100){
-        tenthSeconds = '0'+tenthSeconds;
-    }
-    raceStartTime.setText('Время: ' + minutes + ':' + seconds + '.' + tenthSeconds);
-
     if ( beginningCountdown.repeatCount === 0 ){
+
+        /* подсчет времени всей поездки */
+        var raceDurationTenthSeconds = new Date().getMilliseconds();
+        if(raceDurationTenthSeconds < 100){
+            raceDurationTenthSeconds = '0'+raceDurationTenthSeconds;
+        }
+        if (raceDurationseconds === 60){
+            raceDurationminutes ++;
+            raceDurationseconds = '0' + 0;
+        }
+        raceDuration.setText('Время заезда: \n' + raceDurationminutes + ':' + raceDurationseconds + '.' + raceDurationTenthSeconds);
+
         /* Движение машинки игрока */
         if (directions.up.isDown)
         {
